@@ -26,12 +26,9 @@ const typeDefs = gql`
 
   type Mutation {
     addTodo(title: String!): Todo!
+    updateTodo(id: ID!, completed: Boolean!): Todo!
   }
 `;
-
-type AddTodo = {
-  title: string;
-};
 
 const resolvers = {
   Query: {
@@ -39,7 +36,7 @@ const resolvers = {
   },
 
   Mutation: {
-    addTodo: (_: unknown, { title }: AddTodo) => {
+    addTodo: (_: unknown, { title }: { title: string }) => {
       const newTodo = {
         id: String(todos.length + 1),
         title,
@@ -48,6 +45,17 @@ const resolvers = {
 
       todos.push(newTodo);
       return newTodo;
+    },
+    updateTodo: (
+      _: unknown,
+      { id, completed }: { id: string; completed: boolean }
+    ) => {
+      const todo = todos.find((todo) => todo.id === id);
+      if (!todo) {
+        throw new Error('Todo not found');
+      }
+      todo.completed = completed;
+      return todo;
     },
   },
 };
@@ -58,5 +66,5 @@ const server = new ApolloServer({
 });
 
 server.listen().then(({ url }) => {
-  console.log(`Server ready at${url}`);
+  console.log(`Server ready at ${url}`);
 });
