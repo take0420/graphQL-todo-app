@@ -1,0 +1,23 @@
+# バイナリファイル
+*.o
+*.out
+*.class
+*.exe
+
+# 依存関係
+node_modules/
+vendor/
+
+# 環境設定ファイル
+.env
+
+# キャッシュファイル
+.DS_Store
+Thumbs.db
+
+# ログファイル
+*.log
+
+# 一時ファイル
+*.tmp
+*.swp
