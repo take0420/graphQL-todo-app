@@ -1,17 +1,11 @@
+import { PrismaClient } from '@prisma/client';
 import { ApolloServer, gql } from 'apollo-server';
 
-const todos = [
-  {
-    id: '1',
-    title: 'GraphQLを学習する',
-    completed: false,
-  },
-  {
-    id: '2',
-    title: 'Reactを学習する',
-    completed: false,
-  },
-];
+const prisma = new PrismaClient();
+
+type Context = {
+  prisma: PrismaClient;
+};
 
 const typeDefs = gql`
   type Todo {
@@ -33,46 +27,47 @@ const typeDefs = gql`
 
 const resolvers = {
   Query: {
-    getTodos: () => todos,
+    getTodos: async (_: unknown, args: any, context: Context) => {
+      return await context.prisma.todo.findMany();
+    },
   },
 
   Mutation: {
-    addTodo: (_: unknown, { title }: { title: string }) => {
-      const newTodo = {
-        id: String(todos.length + 1),
-        title,
-        completed: false,
-      };
-
-      todos.push(newTodo);
-      return newTodo;
-    },
-    updateTodo: (
-      _: unknown,
-      { id, completed }: { id: string; completed: boolean }
-    ) => {
-      const todo = todos.find((todo) => todo.id === id);
-      if (!todo) {
-        throw new Error('Todo not found');
-      }
-      todo.completed = completed;
-      return todo;
-    },
-    deleteTodo: (_: unknown, { id }: { id: String }) => {
-      const index = todos.findIndex((todo) => todo.id == id);
-      if (!index) {
-        throw new Error('Todo not found');
-      }
-
-      const deletedTodo = todos.splice(index, 1);
-      return deletedTodo[0];
-    },
+    // addTodo: (_: unknown, { title }: { title: string }) => {
+    //   const newTodo = {
+    //     id: String(todos.length + 1),
+    //     title,
+    //     completed: false,
+    //   };
+    //   todos.push(newTodo);
+    //   return newTodo;
+    // },
+    // updateTodo: (
+    //   _: unknown,
+    //   { id, completed }: { id: string; completed: boolean }
+    // ) => {
+    //   const todo = todos.find((todo) => todo.id === id);
+    //   if (!todo) {
+    //     throw new Error('Todo not found');
+    //   }
+    //   todo.completed = completed;
+    //   return todo;
+    // },
+    // deleteTodo: (_: unknown, { id }: { id: String }) => {
+    //   const index = todos.findIndex((todo) => todo.id == id);
+    //   if (!index) {
+    //     throw new Error('Todo not found');
+    //   }
+    //   const deletedTodo = todos.splice(index, 1);
+    //   return deletedTodo[0];
+    // },
   },
 };
 
 const server = new ApolloServer({
   typeDefs,
   resolvers,
+  context: (): Context => ({ prisma }),
 });
 
 server.listen().then(({ url }) => {
