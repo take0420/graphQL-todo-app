@@ -57,6 +57,12 @@ const resolvers = {
       todo.completed = completed;
       return todo;
     },
+    deleteTodo: (_: unknown, { id }: { id: String }) => {
+      const todo = todos.find((todo) => todo.id == id);
+      if (!todo) {
+        throw new Error('Todo not found');
+      }
+    },
   },
 };
 
