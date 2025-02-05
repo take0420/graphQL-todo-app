@@ -27,6 +27,7 @@ const typeDefs = gql`
   type Mutation {
     addTodo(title: String!): Todo!
     updateTodo(id: ID!, completed: Boolean!): Todo!
+    deleteTodo(id: ID!): Todo!
   }
 `;
 
@@ -58,10 +59,13 @@ const resolvers = {
       return todo;
     },
     deleteTodo: (_: unknown, { id }: { id: String }) => {
-      const todo = todos.find((todo) => todo.id == id);
-      if (!todo) {
+      const index = todos.findIndex((todo) => todo.id == id);
+      if (!index) {
         throw new Error('Todo not found');
       }
+
+      const deletedTodo = todos.splice(index, 1);
+      return deletedTodo[0];
     },
   },
 };
