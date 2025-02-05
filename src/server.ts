@@ -33,34 +33,29 @@ const resolvers = {
   },
 
   Mutation: {
-    // addTodo: (_: unknown, { title }: { title: string }) => {
-    //   const newTodo = {
-    //     id: String(todos.length + 1),
-    //     title,
-    //     completed: false,
-    //   };
-    //   todos.push(newTodo);
-    //   return newTodo;
-    // },
-    // updateTodo: (
-    //   _: unknown,
-    //   { id, completed }: { id: string; completed: boolean }
-    // ) => {
-    //   const todo = todos.find((todo) => todo.id === id);
-    //   if (!todo) {
-    //     throw new Error('Todo not found');
-    //   }
-    //   todo.completed = completed;
-    //   return todo;
-    // },
-    // deleteTodo: (_: unknown, { id }: { id: String }) => {
-    //   const index = todos.findIndex((todo) => todo.id == id);
-    //   if (!index) {
-    //     throw new Error('Todo not found');
-    //   }
-    //   const deletedTodo = todos.splice(index, 1);
-    //   return deletedTodo[0];
-    // },
+    addTodo: (_: unknown, { title }: { title: string }, context: Context) => {
+      return context.prisma.todo.create({
+        data: {
+          title,
+          completed: false,
+        },
+      });
+    },
+    updateTodo: (
+      _: unknown,
+      { id, completed }: { id: string; completed: boolean },
+      context: Context
+    ) => {
+      return context.prisma.todo.update({
+        where: { id },
+        data: { completed },
+      });
+    },
+    deleteTodo: (_: unknown, { id }: { id: string }, context: Context) => {
+      return context.prisma.todo.delete({
+        where: { id },
+      });
+    },
   },
 };
 
